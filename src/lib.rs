@@ -352,18 +352,13 @@ impl Interpreter {
             .ok_or(Error::InterpreterNotSetup)
             .unwrap();
 
-        match interpreter
-            .get_state(&key.to_string())
-            .ok()
-            .ok_or(Error::FailedToGetState)
-            .unwrap()
-        {
-            StateValue::String(string) => Variant::new(GodotString::from_str(string)),
-            StateValue::Float(float) => Variant::new(float),
-            StateValue::Int(int) => Variant::new(int),
-            StateValue::Boolean(bool) => Variant::new(bool),
-            StateValue::Empty => Variant::nil(),
-            StateValue::Tuple(..) => {
+        match interpreter.get_state(&key.to_string()) {
+            Some(StateValue::String(string)) => Variant::new(GodotString::from_str(string)),
+            Some(StateValue::Float(float)) => Variant::new(float),
+            Some(StateValue::Int(int)) => Variant::new(int),
+            Some(StateValue::Boolean(bool)) => Variant::new(bool),
+            None | Some(StateValue::Empty) => Variant::nil(),
+            Some(StateValue::Tuple(..)) => {
                 unimplemented!("did not implement recursion to deserialize arrays")
             }
         }
